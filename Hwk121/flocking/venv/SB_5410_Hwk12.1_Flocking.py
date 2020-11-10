@@ -3,13 +3,16 @@
 Created on Sat Jan 14 23:29:06 2017
 
 @author: Daniel Karandikar
+Modified by: Scott Bing
+Date:  11/10/2020
 
 @changelog
 20201107 - Added kwargs screen with and height parameters
 20201107 - Added Global variables ATTRACT, REPULSE, ALIGN to activate
             and deactivate flocking rules
 20201107 - Added a Checkbox to activate and deactivate the obstacles
-20201109 - changed boid colors
+20201107 - channged boids to leave trails
+20201109 - changed boid colors to be randomly generated
 
 @license
 MIT License
@@ -642,7 +645,7 @@ class Flocking(tk.Tk):
 
         if self.running.get():
             self.world.step()
-            #self.canvas.delete("all")
+            # self.canvas.delete("all")
             self.draw_boids()
             self.draw_obstacles()
 
@@ -657,24 +660,29 @@ class Flocking(tk.Tk):
     def draw_boids(self):
         '''Draws boids onto canvas'''
 
+        # set a color scheme
+        focus_colour = ("springgreen", "violet", "magenta")
+        obstacle_color = ("darkgreen", "purple", "turquoise")
+        aware_color = ("deepskyblue", "maroon", "salmon")
+        notaware_color = ("teal", "firebrick", "cyan")
+
         for boid in self.world.boids:
             tip_x = boid.pos_x + (20 * boid.vel_x)
             tip_y = boid.pos_y + (20 * boid.vel_y)
 
+            # random number between 0 -2 (1-3)
+            i = random.randint(0, 2)
+
+            # randomly generate colors
             if boid.focus:
-                colour = "red"
+                colour = focus_colour[i]
             else:
                 if boid.obstacles:
-                    colour = "red"
+                    colour = obstacle_color[i]
                 elif len(boid.aware) > 0:
-                    colour = "green"
+                    colour = aware_color[i]
                 else:
-                    colour = "blue"
-
-            # self.canvas.create_oval((tip_x, tip_y,
-            #                          boid.pos_x - 3,
-            #                          boid.pos_y + 3),
-            #                         fill=colour, outline="", tags="boid")
+                    colour = notaware_color[i]
 
             self.canvas.create_polygon((tip_x, tip_y,
                                         int(boid.pos_x - (5 * boid.vel_y)),
